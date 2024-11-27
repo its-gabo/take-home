@@ -3,10 +3,10 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import { Card } from "./Card";
 
-import { ListItem } from "../../api/getListData";
+import { ExtendedCardType } from "./useCardStore";
 
 interface CardListProps {
-  cards: ListItem[];
+  cards: ExtendedCardType[];
 }
 
 export const CardList: FC<CardListProps> = ({ cards }) => {
@@ -18,12 +18,7 @@ export const CardList: FC<CardListProps> = ({ cards }) => {
   return (
     <div ref={cardListParentRef} className="flex flex-col gap-y-3">
       {cards.map((card) => (
-        <Card
-          key={card.id}
-          title={card.title}
-          description={card.description}
-          isVisible={card.isVisible}
-        />
+        <Card key={card.id} card={card} />
       ))}
     </div>
   );

@@ -1,27 +1,42 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import { Button } from "../../components/Button";
-import { ChevronUpIcon, ChevronDownIcon, XMarkIcon } from "../../icons";
+import { ToggleButton } from "../../components/ToggleButton";
 
-import { ListItem } from "../../api/getListData";
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  XMarkIcon,
+  RevertIcon,
+} from "../../icons";
+
+import { ExtendedCardType, useCardStore } from "./useCardStore";
 
 type CardProps = {
-  title: ListItem["title"];
-  description: ListItem["description"];
-  isVisible: ListItem["isVisible"];
+  card: ExtendedCardType;
 };
 
-export const Card: FC<CardProps> = ({ title, description, isVisible }) => {
+export const Card: FC<CardProps> = ({
+  card: { id, title, description, isCollapsed, isDeleted },
+}) => {
   const [cardParentRef] = useAutoAnimate({
     duration: 250,
     easing: "ease-in-out",
   });
 
-  const [isCollapsed, setIsCollapsed] = useState(isVisible);
+  const { toggleCardCollapse, removeCard, revertCard } = useCardStore();
 
   const handleCollapse = () => {
-    setIsCollapsed((prev) => !prev);
+    toggleCardCollapse(id);
+  };
+
+  const handleRemove = () => {
+    removeCard(id);
+  };
+
+  const handleRevert = () => {
+    revertCard(id);
   };
 
   return (
@@ -29,15 +44,28 @@ export const Card: FC<CardProps> = ({ title, description, isVisible }) => {
       <div className="flex justify-between mb-0.5">
         <h1 className="font-medium">{title}</h1>
         <div className="flex">
-          <Button onClick={handleCollapse}>
-            {isCollapsed ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          </Button>
-          <Button>
-            <XMarkIcon />
-          </Button>
+          {isDeleted ? (
+            <Button onClick={handleRevert}>
+              <RevertIcon />
+            </Button>
+          ) : (
+            <>
+              <ToggleButton
+                handleToggle={handleCollapse}
+                isToggled={isCollapsed}
+                iconNotToggled={<ChevronUpIcon />}
+                iconToggled={<ChevronDownIcon />}
+              />
+              <Button onClick={handleRemove}>
+                <XMarkIcon />
+              </Button>
+            </>
+          )}
         </div>
       </div>
-      {isCollapsed ? <p className="text-sm">{description}</p> : null}
+      {!isCollapsed && !isDeleted ? (
+        <p className="text-sm">{description}</p>
+      ) : null}
     </div>
   );
 };
