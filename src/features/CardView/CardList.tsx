@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import { Card } from "./Card";
 
@@ -9,10 +10,20 @@ interface CardListProps {
 }
 
 export const CardList: FC<CardListProps> = ({ cards }) => {
+  const [cardListParentRef] = useAutoAnimate({
+    duration: 250,
+    easing: "ease-in-out",
+  });
+
   return (
-    <div className="flex flex-col gap-y-3">
+    <div ref={cardListParentRef} className="flex flex-col gap-y-3">
       {cards.map((card) => (
-        <Card key={card.id} title={card.title} description={card.description} />
+        <Card
+          key={card.id}
+          title={card.title}
+          description={card.description}
+          isVisible={card.isVisible}
+        />
       ))}
     </div>
   );
