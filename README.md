@@ -1,3 +1,24 @@
+## Preview
+
+You can test the implementation on [Vercel](https://recruitment-exercise-singledraft.vercel.app/)
+
+## Tests
+
+### Choose a testing library
+
+Since we’re using Vite:
+
+- Vitest is a natural fit for unit and integration tests.
+- For end-to-end (E2E) testing, consider Cypress for a user-focused approach.
+
+### Define test scenarios for example our `<Card>` component
+
+Key behaviors to test:
+
+- Collapsibility: Ensure the card can toggle between collapsed and expanded states.
+- Deletability: Verify the card can be deleted and no longer appears in the DOM.
+- Revertibility: Check if the card can revert to a previous state.
+
 ## Rules
 
 - add/remove/modify existing code to achieve the end result (some code needs a refactor)
