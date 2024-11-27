@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { devtools, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 import { ListItem } from "../../api/getListData";
 
@@ -26,87 +26,84 @@ type PersistedCardStoreState = {
 };
 
 export const useCardStore = create<CardStoreState & CardStoreActions>()(
-  devtools(
-    persist(
-      immer((set) => ({
-        cards: [],
-        savedCards: {},
+  persist(
+    immer((set) => ({
+      cards: [],
+      savedCards: {},
 
-        saveCardsFromServer: (cardsFromServer) => {
-          set((state) => {
-            state.cards = [];
+      saveCardsFromServer: (cardsFromServer) => {
+        set((state) => {
+          state.cards = [];
 
-            for (const card of cardsFromServer) {
-              const savedCard = state.savedCards[card.id];
+          for (const card of cardsFromServer) {
+            const savedCard = state.savedCards[card.id];
 
-              if (!savedCard) {
-                const newCard = {
-                  ...card,
-                  isCollapsed: true,
-                  isDeleted: false,
-                };
+            if (!savedCard) {
+              const newCard = {
+                ...card,
+                isCollapsed: true,
+                isDeleted: false,
+              };
 
-                state.cards.push(newCard);
-                state.savedCards[card.id] = newCard;
-              } else {
-                savedCard.isVisible = card.isVisible;
+              state.cards.push(newCard);
+              state.savedCards[card.id] = newCard;
+            } else {
+              savedCard.isVisible = card.isVisible;
 
-                state.cards.push(savedCard);
-              }
+              state.cards.push(savedCard);
             }
-          });
-        },
+          }
+        });
+      },
 
-        removeCard: (cardId) => {
-          set((state) => {
-            const card = state.cards.find((card) => card.id === cardId);
+      removeCard: (cardId) => {
+        set((state) => {
+          const card = state.cards.find((card) => card.id === cardId);
 
-            if (card) {
-              card.isDeleted = true;
+          if (card) {
+            card.isDeleted = true;
 
-              state.savedCards[cardId].isDeleted = true;
-            }
-          });
-        },
+            state.savedCards[cardId].isDeleted = true;
+          }
+        });
+      },
 
-        revertCard: (cardId) => {
-          set((state) => {
-            const card = state.cards.find((card) => card.id === cardId);
+      revertCard: (cardId) => {
+        set((state) => {
+          const card = state.cards.find((card) => card.id === cardId);
 
-            if (card) {
-              card.isDeleted = false;
+          if (card) {
+            card.isDeleted = false;
 
-              state.savedCards[cardId].isDeleted = false;
-            }
-          });
-        },
+            state.savedCards[cardId].isDeleted = false;
+          }
+        });
+      },
 
-        toggleCardCollapse: (cardId) => {
-          set((state) => {
-            const card = state.cards.find((card) => card.id === cardId);
+      toggleCardCollapse: (cardId) => {
+        set((state) => {
+          const card = state.cards.find((card) => card.id === cardId);
 
-            if (card) {
-              card.isCollapsed = !card.isCollapsed;
+          if (card) {
+            card.isCollapsed = !card.isCollapsed;
 
-              state.savedCards[cardId].isCollapsed =
-                !state.savedCards[cardId].isCollapsed;
-            }
-          });
-        },
-      })),
-      {
-        name: "card-store",
-        partialize: (state) => ({
-          savedCards: state.savedCards,
-        }),
-        merge: (persistedState, currentState) => {
-          return {
-            ...currentState,
-            savedCards: (persistedState as PersistedCardStoreState).savedCards,
-          };
-        },
-      }
-    ),
-    { name: "CardStore" }
+            state.savedCards[cardId].isCollapsed =
+              !state.savedCards[cardId].isCollapsed;
+          }
+        });
+      },
+    })),
+    {
+      name: "card-store",
+      partialize: (state) => ({
+        savedCards: state.savedCards,
+      }),
+      merge: (persistedState, currentState) => {
+        return {
+          ...currentState,
+          savedCards: (persistedState as PersistedCardStoreState).savedCards,
+        };
+      },
+    }
   )
 );
